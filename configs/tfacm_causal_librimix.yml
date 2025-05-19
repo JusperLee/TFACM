@@ -1,0 +1,79 @@
+# Network config
+audionet:
+  audionet_name: TFACMCausal
+  audionet_config:
+    input_dim: 64
+    n_srcs: 2
+    n_fft: 64
+    stride: 8
+    window: hann
+    n_imics: 1
+    n_layers: 3  # 6
+    lstm_hidden_units: 64  # 256
+    attn_n_head: 2  # 4
+    attn_approx_qk_dim: 128  # 512
+    emb_dim: 64
+    emb_ks: 8
+    emb_hs: 1
+    activation: prelu
+    eps: 1.0e-5
+    use_builtin_complex: False
+
+# Loss config
+loss:
+  train:
+    loss_func: PITLossWrapper
+    sdr_type: pairwise_neg_snr
+    config:
+      pit_from: pw_mtx
+      threshold_byloss: false
+  val:
+    loss_func: PITLossWrapper
+    sdr_type: pairwise_neg_sisdr
+    config:
+      pit_from: pw_mtx
+      threshold_byloss: false
+
+training:
+  system: AudioLightningModule
+  gpus: [4,5,6,7]
+  parallel: ddp
+  epochs: 500
+  early_stop:
+    monitor: val_loss/dataloader_idx_0
+    mode: min
+    patience: 20
+    verbose: true
+  SpeedAug: False
+  
+# Optim config
+optimizer:
+  optim_name: adam
+  lr: 0.001
+  weight_decay: 0
+
+# Sche config
+scheduler: 
+  sche_name: ReduceLROnPlateau
+  sche_config:
+    patience: 10
+    factor: 0.5
+
+# Data config
+datamodule:
+  data_name: WhamDataModule
+  data_config:
+    train_dir: ../dataset/libri2mix/train-100 # ../dataset/wham/wav8k/min/tr  # DataPreProcess/Mono-MP3D-Remix/train
+    valid_dir: ../dataset/libri2mix/dev # ../dataset/wham/wav8k/min/cv  # DataPreProcess/Mono-MP3D-Remix/val
+    test_dir: ../dataset/libri2mix/test # ../dataset/wham/wav8k/min/tt  # DataPreProcess/Mono-MP3D-Remix/test
+    n_src: 2
+    sample_rate: 8000
+    segment: 3.0
+    normalize_audio: false
+    batch_size: 1
+    num_workers: 8
+    pin_memory: true
+    persistent_workers: false
+
+exp:
+  exp_name: TFACM-librmix
