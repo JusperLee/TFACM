@@ -3,7 +3,7 @@
   <strong>Guo Chen<sup>*</sup>, Kai Li<sup>*</sup>, Runxuan Yang, Xiaolin Hu</strong><br>
     <strong>Tsinghua University</strong><br>
     <strong><sup>*</sup>Equal contribution</strong><br>
-  <a href="YOUR_ARXIV_LINK_HERE">📜 Paper</a> | <a href="YOUR_DEMO_LINK_HERE">🎶 Demo</a> | <a href="YOUR_DATASET_LINK_HERE">🤗 Dataset</a> <!-- TODO: Update links -->
+  <a href="https://arxiv.org/abs/2505.09991">📜 Paper</a> | <a href="https://cslikai.cn/TFACM">🎶 Demo</a> | <a href="https://huggingface.co/datasets/JusperLee/Echoset">🤗 Dataset</a> <!-- TODO: Update links -->
 
 <p align="center">
   <img src="https://visitor-badge.laobi.icu/badge?page_id=JusperLee.TFACM" alt="Visitor Badge" /> <!-- TODO: Update JusperLee -->
