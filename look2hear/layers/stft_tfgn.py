@@ -7,7 +7,7 @@ from packaging.version import parse as V
 from torch_complex.tensor import ComplexTensor
 from typeguard import check_argument_types
 
-from ..utils.complex_utils import is_complex
+from ..utils.complex_utils import is_complex, to_complex
 from ..utils.inversible_interface import InversibleInterface
 from ..utils.nets_utils import make_pad_mask
 
@@ -197,39 +197,18 @@ class Stft(torch.nn.Module, InversibleInterface):
             wavs: (batch, samples)
             ilens: (batch,)
         """
-        if V(torch.__version__) >= V("1.6.0"):
-            istft = torch.functional.istft
-        else:
-            try:
-                import torchaudio
-            except ImportError:
-                raise ImportError(
-                    "Please install torchaudio>=0.3.0 or use torch>=1.6.0"
-                )
-
-            if not hasattr(torchaudio.functional, "istft"):
-                raise ImportError(
-                    "Please install torchaudio>=0.3.0 or use torch>=1.6.0"
-                )
-            istft = torchaudio.functional.istft
+        input = to_complex(input)
 
         if self.window is not None:
             window_func = getattr(torch, f"{self.window}_window")
-            if is_complex(input):
-                datatype = input.real.dtype
-            else:
-                datatype = input.dtype
+            datatype = input.real.dtype
             window = window_func(self.win_length, dtype=datatype, device=input.device)
         else:
             window = None
 
-        if is_complex(input):
-            input = torch.stack([input.real, input.imag], dim=-1)
-        elif input.shape[-1] != 2:
-            raise TypeError("Invalid input type")
         input = input.transpose(1, 2)
 
-        wavs = istft(
+        wavs = torch.functional.istft(
             input,
             n_fft=self.n_fft,
             hop_length=self.hop_length,
@@ -239,6 +218,7 @@ class Stft(torch.nn.Module, InversibleInterface):
             normalized=self.normalized,
             onesided=self.onesided,
             length=ilens.max() if ilens is not None else ilens,
+            return_complex=False,
         )
 
         return wavs, ilens
